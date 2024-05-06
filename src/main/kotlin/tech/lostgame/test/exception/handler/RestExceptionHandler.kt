@@ -3,18 +3,16 @@ package tech.lostgame.test.exception.handler
 import org.apache.logging.log4j.util.Strings
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import tech.lostgame.test.dto.response.ResponseDTO
 import tech.lostgame.test.entity.enums.Errors
 import tech.lostgame.test.exception.AlreadyProcessedTransactionException
 import tech.lostgame.test.exception.InsufficientUserBalanceException
-import tech.lostgame.test.exception.InvalidAuthenticationException
-import tech.lostgame.test.exception.MissingAuthenticationException
 import tech.lostgame.test.exception.UnknownUserCurrencyException
 import tech.lostgame.test.exception.ValidationException
 
-@ControllerAdvice
+@RestControllerAdvice
 class RestExceptionHandler {
 
     @ExceptionHandler
@@ -22,22 +20,6 @@ class RestExceptionHandler {
         return ResponseEntity(
             buildResponse(false, Strings.EMPTY, e.message.toString(), Errors.INTERNAL_ERROR),
             HttpStatus.INTERNAL_SERVER_ERROR
-        )
-    }
-
-    @ExceptionHandler
-    fun handleMissingAuthenticationException(e: MissingAuthenticationException): ResponseEntity<ResponseDTO> {
-        return ResponseEntity(
-            buildResponse(false, Strings.EMPTY, e.message.toString(), Errors.SIGN_NOT_PROVIDED),
-            HttpStatus.UNAUTHORIZED
-        )
-    }
-
-    @ExceptionHandler
-    fun handleInvalidAuthenticationException(e: InvalidAuthenticationException): ResponseEntity<ResponseDTO> {
-        return ResponseEntity(
-            buildResponse(false, Strings.EMPTY, e.message.toString(), Errors.INVALID_SIGN),
-            HttpStatus.UNAUTHORIZED
         )
     }
 

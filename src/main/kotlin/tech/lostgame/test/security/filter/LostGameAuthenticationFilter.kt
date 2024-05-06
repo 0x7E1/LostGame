@@ -3,14 +3,18 @@ package tech.lostgame.test.security.filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.apache.logging.log4j.util.Strings
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.util.StreamUtils
 import org.springframework.web.filter.OncePerRequestFilter
-import tech.lostgame.test.exception.InvalidAuthenticationException
-import tech.lostgame.test.exception.MissingAuthenticationException
+import tech.lostgame.test.dto.response.ResponseDTO
+import tech.lostgame.test.entity.enums.Errors
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+
 
 @Component
 class LostGameAuthenticationFilter(
@@ -27,10 +31,20 @@ class LostGameAuthenticationFilter(
 
         if (token != null) {
             if (!isValid(token, requestBody)) {
-                throw throw InvalidAuthenticationException("Bad credentials. Please provide valid \"Sign\" value.")
+                handleError(
+                    response,
+                    Errors.INVALID_SIGN,
+                    HttpStatus.UNAUTHORIZED,
+                    "Bad credentials. Please provide valid \"Sign\" value"
+                )
             }
         } else {
-            throw MissingAuthenticationException("Authentication header (\"Sign\") hasn't been provided.")
+            handleError(
+                response,
+                Errors.SIGN_NOT_PROVIDED,
+                HttpStatus.UNAUTHORIZED,
+                "Authentication header (\"Sign\") hasn't been provided"
+            )
         }
 
         filterChain.doFilter(request, response)
@@ -58,5 +72,20 @@ class LostGameAuthenticationFilter(
             hexChars[i * 2 + 1] = hexArray[v and 0x0F]
         }
         return String(hexChars)
+    }
+
+    private fun handleError(response: HttpServletResponse, error: Errors, status: HttpStatus, message: String) {
+        val errorResponse = ResponseEntity<ResponseDTO>(
+            ResponseDTO(
+                Strings.EMPTY,
+                false,
+                message,
+                error.toString()
+            ),
+            status
+        )
+
+        response.status = status.value()
+        response.writer.write(errorResponse.body.toString())
     }
 }

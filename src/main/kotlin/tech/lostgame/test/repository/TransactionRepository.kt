@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import tech.lostgame.test.entity.Transaction
 
 @Repository
-interface TransactionRepository : JpaRepository<Transaction, Long>
+interface TransactionRepository : JpaRepository<Transaction, String>

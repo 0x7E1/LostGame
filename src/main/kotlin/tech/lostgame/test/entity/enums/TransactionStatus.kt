@@ -1,5 +1,5 @@
 package tech.lostgame.test.entity.enums
 
 enum class TransactionStatus {
-    PROCESSED, NOT_PROCESSED
+    COMPLETED, NOT_COMPLETED
 }

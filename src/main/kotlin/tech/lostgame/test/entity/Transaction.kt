@@ -1,13 +1,14 @@
 package tech.lostgame.test.entity
 
 import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import tech.lostgame.test.entity.enums.TransactionStatus
 
-@Entity
+@Entity(name = "transactions")
 data class Transaction(
-    var id: Long?,
     var status: TransactionStatus,
     var gameSessionId: String,
+    @Id
     var transactionId: String,
     var amount: Long,
     var currency: String,
